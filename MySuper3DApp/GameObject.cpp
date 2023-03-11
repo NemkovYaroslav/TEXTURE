@@ -13,6 +13,7 @@ GameObject::GameObject(GameObject* parent)
 	this->transformComponent = new TransformComponent();
 	AddComponent(transformComponent);
 	this->renderComponent = nullptr;
+	this->collisionComponent = nullptr;
 	this->radius = 0.0f;
 }
 
@@ -31,9 +32,6 @@ void GameObject::CreateSphere(float radius, int sliceCount, int stackCount, Dire
 	//renderComponent = new RenderComponent("../Shaders/TexturedShader.hlsl", L".../Textures/Vladik.jpeg", D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	renderComponent = new RenderComponent("../Shaders/MyVeryFirstShader.hlsl", D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	renderComponent->AddSphere(radius, sliceCount, stackCount, color);
-	collisionSphere = new DirectX::BoundingSphere();
-	collisionSphere->Center = transformComponent->GetPosition();
-	collisionSphere->Radius = radius;
 	AddComponent(renderComponent);
 }
 
@@ -60,13 +58,15 @@ void GameObject::Update(float deltaTime)
 	<< std::endl;
 	*/
 
-	Game::GetInstance()->gameObjects.at(2)->collisionSphere->Center = Game::GetInstance()->gameObjects.at(2)->transformComponent->GetPosition();
+	//Game::GetInstance()->gameObjects.at(2)->collisionSphere->Center = Game::GetInstance()->gameObjects.at(2)->transformComponent->GetPosition();
 
+	/*
 	std::cout
 		<< " X: " << Game::GetInstance()->gameObjects.at(2)->collisionSphere->Center.x
 		<< " Y: " << Game::GetInstance()->gameObjects.at(2)->collisionSphere->Center.y
 		<< " Z: " << Game::GetInstance()->gameObjects.at(2)->collisionSphere->Center.z
 	<< std::endl;
+	*/
 
 	/*
 	// при столкновении

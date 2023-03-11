@@ -3,6 +3,7 @@
 
 class TransformComponent;
 class RenderComponent;
+class CollisionComponent;
 class Component;
 
 using namespace DirectX::SimpleMath;
@@ -11,10 +12,12 @@ class GameObject
 {
 public:
 
-	DirectX::BoundingSphere* collisionSphere;
+	//DirectX::BoundingSphere* collisionSphere;
+
 
 	TransformComponent* transformComponent;
 	RenderComponent* renderComponent;
+	CollisionComponent* collisionComponent;
 
 	std::vector<Component*> components;
 

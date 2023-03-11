@@ -19,12 +19,13 @@ void KatamariDamacyGame::Initialize()
 
 	GameObject* katamari = new GameObject();
 	katamari->radius = 1.0f;
+	katamari->transformComponent->SetPosition(Vector3(0, katamari->radius, 0));
 	katamari->CreateSphere(katamari->radius);
 	KatamariControllerComponent* katamariController = new KatamariControllerComponent();
 	katamariController->katamariSpeed = 5.0f;
 	katamari->AddComponent(katamariController);
-	katamari->AddComponent(new CollisionComponent(katamari->transformComponent->GetPosition(), katamari->radius));
-	katamari->transformComponent->SetPosition(Vector3(0, katamari->radius, 0));
+	//CollisionComponent* katamariCollision = new CollisionComponent(katamari->transformComponent->GetPosition(), katamari->radius);
+	//katamari->AddComponent(katamariCollision);
 
 	GameObject* camera = new GameObject();
 	CameraComponent* cameraComponent = new CameraComponent();
@@ -38,7 +39,8 @@ void KatamariDamacyGame::Initialize()
 	GameObject* object = new GameObject();
 	object->radius = 0.5f;
 	object->CreateSphere(object->radius);
-	object->AddComponent(new CollisionComponent(object->transformComponent->GetPosition(), object->radius));
+	CollisionComponent* objectCollision = new CollisionComponent(object->transformComponent->GetPosition(), object->radius);
+	object->AddComponent(objectCollision);
 	object->transformComponent->SetPosition(Vector3(0, object->radius, -1.5f));
 
 	Game::GetInstance()->AddGameObject(grid);

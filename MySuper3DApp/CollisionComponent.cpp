@@ -5,11 +5,17 @@
 CollisionComponent::CollisionComponent(Vector3 position, float radius)
 {
 	this->sphereCollision = new DirectX::BoundingSphere();
-	this->sphereCollision->Center = position;
-	this->sphereCollision->Radius = radius;
+	this->sphereCollision->Center = Vector3::Zero;
+	this->sphereCollision->Radius = 0.0f;
+}
+
+void CollisionComponent::Initialize()
+{
+	this->sphereCollision->Center = gameObject->transformComponent->GetPosition();
+	this->sphereCollision->Radius = gameObject->radius;
 }
 
 void CollisionComponent::Update(float deltaTime)
 {
-	//sphereCollision->Center = gameObject->transformComponent->GetPosition();
+	sphereCollision->Center = gameObject->transformComponent->GetPosition();
 }

@@ -11,6 +11,7 @@ public:
 	DirectX::BoundingSphere* sphereCollision;
 
 	CollisionComponent(Vector3 position, float radius);
+	virtual void Initialize() override;
 	virtual void Update(float deltaTime) override;
 };
 
