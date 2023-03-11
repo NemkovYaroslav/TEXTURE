@@ -24,8 +24,9 @@ void KatamariDamacyGame::Initialize()
 	KatamariControllerComponent* katamariController = new KatamariControllerComponent();
 	katamariController->katamariSpeed = 5.0f;
 	katamari->AddComponent(katamariController);
-	//CollisionComponent* katamariCollision = new CollisionComponent(katamari->transformComponent->GetPosition(), katamari->radius);
-	//katamari->AddComponent(katamariCollision);
+	CollisionComponent* katamariCollision = new CollisionComponent();
+	katamari->collisionComponent = katamariCollision;
+	katamari->AddComponent(katamariCollision);
 
 	GameObject* camera = new GameObject();
 	CameraComponent* cameraComponent = new CameraComponent();
@@ -36,17 +37,27 @@ void KatamariDamacyGame::Initialize()
 	Game::GetInstance()->currentCamera = cameraComponent;
 	katamariController->cameraTransform = camera->transformComponent;
 
-	GameObject* object = new GameObject();
-	object->radius = 0.5f;
-	object->CreateSphere(object->radius);
-	CollisionComponent* objectCollision = new CollisionComponent(object->transformComponent->GetPosition(), object->radius);
-	object->AddComponent(objectCollision);
-	object->transformComponent->SetPosition(Vector3(0, object->radius, -1.5f));
+	GameObject* object0 = new GameObject();
+	object0->radius = 0.5f;
+	object0->CreateSphere(object0->radius);
+	CollisionComponent* objectCollision0 = new CollisionComponent();
+	object0->collisionComponent = objectCollision0;
+	object0->AddComponent(objectCollision0);
+	object0->transformComponent->SetPosition(Vector3(0, object0->radius, -1.5f));
+
+	GameObject* object1 = new GameObject();
+	object1->radius = 0.5f;
+	object1->CreateSphere(object1->radius);
+	CollisionComponent* objectCollision1 = new CollisionComponent();
+	object1->collisionComponent = objectCollision1;
+	object1->AddComponent(objectCollision1);
+	object1->transformComponent->SetPosition(Vector3(0, object1->radius, 1.5f));
 
 	Game::GetInstance()->AddGameObject(grid);
 	Game::GetInstance()->AddGameObject(camera);
 	Game::GetInstance()->AddGameObject(katamari);
-	Game::GetInstance()->AddGameObject(object);
+	Game::GetInstance()->AddGameObject(object0);
+	Game::GetInstance()->AddGameObject(object1);
 }
 
 void KatamariDamacyGame::Run()

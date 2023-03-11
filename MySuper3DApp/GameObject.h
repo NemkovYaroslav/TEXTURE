@@ -12,9 +12,6 @@ class GameObject
 {
 public:
 
-	//DirectX::BoundingSphere* collisionSphere;
-
-
 	TransformComponent* transformComponent;
 	RenderComponent* renderComponent;
 	CollisionComponent* collisionComponent;

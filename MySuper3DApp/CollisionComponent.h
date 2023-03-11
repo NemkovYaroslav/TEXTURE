@@ -9,8 +9,9 @@ class CollisionComponent : public Component
 public:
 
 	DirectX::BoundingSphere* sphereCollision;
+	bool isPickedUp;
 
-	CollisionComponent(Vector3 position, float radius);
+	CollisionComponent();
 	virtual void Initialize() override;
 	virtual void Update(float deltaTime) override;
 };

@@ -49,39 +49,6 @@ void GameObject::Update(float deltaTime)
 	{
 		component->Update(deltaTime);
 	}
-
-	/*
-	std::cout
-		<< " X: " << Game::GetInstance()->gameObjects.at(2)->transformComponent->GetPosition().x
-		<< " Y: " << Game::GetInstance()->gameObjects.at(2)->transformComponent->GetPosition().y
-		<< " Z: " << Game::GetInstance()->gameObjects.at(2)->transformComponent->GetPosition().z
-	<< std::endl;
-	*/
-
-	//Game::GetInstance()->gameObjects.at(2)->collisionSphere->Center = Game::GetInstance()->gameObjects.at(2)->transformComponent->GetPosition();
-
-	/*
-	std::cout
-		<< " X: " << Game::GetInstance()->gameObjects.at(2)->collisionSphere->Center.x
-		<< " Y: " << Game::GetInstance()->gameObjects.at(2)->collisionSphere->Center.y
-		<< " Z: " << Game::GetInstance()->gameObjects.at(2)->collisionSphere->Center.z
-	<< std::endl;
-	*/
-
-	/*
-	// при столкновении
-	if (true)
-	{
-		Game::GetInstance()->gameObjects.at(1); // катамари
-		Game::GetInstance()->gameObjects.at(3); // объект
-
-		Vector3 pos = Game::GetInstance()->gameObjects.at(3)->transformComponent->GetPosition();
-		Quaternion rot = Game::GetInstance()->gameObjects.at(3)->transformComponent->GetRotation();
-		Game::GetInstance()->gameObjects.at(3)->transformComponent->parent = Game::GetInstance()->gameObjects.at(1)->transformComponent;
-		Game::GetInstance()->gameObjects.at(3)->transformComponent->SetPosition(pos);
-		Game::GetInstance()->gameObjects.at(3)->transformComponent->SetRotation(rot);
-	}
-	*/
 }
 
 void GameObject::AddComponent(Component* component)
