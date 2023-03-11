@@ -12,14 +12,8 @@ GameObject::GameObject(GameObject* parent)
 {
 	this->transformComponent = new TransformComponent();
 	AddComponent(transformComponent);
-
 	this->renderComponent = nullptr;
-
-	this->rotationAxis = Vector3::UnitY;
-	this->rotationSpeed = 0;
-
 	this->radius = 0.0f;
-	this->isKatamari = false;
 }
 
 GameObject::~GameObject()
@@ -37,7 +31,9 @@ void GameObject::CreateSphere(float radius, int sliceCount, int stackCount, Dire
 	//renderComponent = new RenderComponent("../Shaders/TexturedShader.hlsl", L".../Textures/Vladik.jpeg", D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	renderComponent = new RenderComponent("../Shaders/MyVeryFirstShader.hlsl", D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	renderComponent->AddSphere(radius, sliceCount, stackCount, color);
-	
+	collisionSphere = new DirectX::BoundingSphere();
+	collisionSphere->Center = transformComponent->GetPosition();
+	collisionSphere->Radius = radius;
 	AddComponent(renderComponent);
 }
 
@@ -49,12 +45,6 @@ void GameObject::Initialize()
 	}
 }
 
-void GameObject::AddComponent(Component* component)
-{
-	components.push_back(component);
-	component->gameObject = this;
-}
-
 void GameObject::Update(float deltaTime)
 {
 	for (const auto& component : components)
@@ -63,55 +53,39 @@ void GameObject::Update(float deltaTime)
 	}
 
 	/*
-	for (const auto& gameObject : Game::GetInstance()->gameObjects)
-	{
-		if ((gameObject != Game::GetInstance()->gameObjects.at(0)) && (gameObject != Game::GetInstance()->gameObjects.at(1)))
-		{
-			if (Game::GetInstance()->gameObjects.at(1)->collisionSphere->Intersects(*(gameObject->collisionSphere)))
-			{
-				std::cout << gameObject << std::endl;
-				//gameObject->parent = Game::GetInstance()->gameObjects.at(1);
-			}
-			else
-			{
-				std::cout << "NO" << std::endl;
-			}
-		}
-	}
+	std::cout
+		<< " X: " << Game::GetInstance()->gameObjects.at(2)->transformComponent->GetPosition().x
+		<< " Y: " << Game::GetInstance()->gameObjects.at(2)->transformComponent->GetPosition().y
+		<< " Z: " << Game::GetInstance()->gameObjects.at(2)->transformComponent->GetPosition().z
+	<< std::endl;
 	*/
 
-	if (isKatamari)
+	Game::GetInstance()->gameObjects.at(2)->collisionSphere->Center = Game::GetInstance()->gameObjects.at(2)->transformComponent->GetPosition();
+
+	std::cout
+		<< " X: " << Game::GetInstance()->gameObjects.at(2)->collisionSphere->Center.x
+		<< " Y: " << Game::GetInstance()->gameObjects.at(2)->collisionSphere->Center.y
+		<< " Z: " << Game::GetInstance()->gameObjects.at(2)->collisionSphere->Center.z
+	<< std::endl;
+
+	/*
+	// при столкновении
+	if (true)
 	{
-		//Matrix rotationMatrix = Matrix::CreateFromYawPitchRoll(Game::GetInstance()->GetCamera()->GetCameraController()->yaw, 0, 0);
-		
-		if (Game::GetInstance()->GetInputDevice()->IsKeyDown(Keys::A))
-		{
+		Game::GetInstance()->gameObjects.at(1); // катамари
+		Game::GetInstance()->gameObjects.at(3); // объект
 
-			//rotation *= Quaternion::CreateFromAxisAngle(Vector3::Transform(Vector3::Backward, rotationMatrix), rotationSpeed * deltaTime);
-			//position += deltaTime * rotationSpeed * Vector3::Transform(Vector3::Left, rotationMatrix);
-		}
-		if (Game::GetInstance()->GetInputDevice()->IsKeyDown(Keys::D))
-		{
-
-			//rotation *= Quaternion::CreateFromAxisAngle(Vector3::Transform(Vector3::Forward, rotationMatrix), rotationSpeed * deltaTime);
-			//position += deltaTime * rotationSpeed * Vector3::Transform(Vector3::Right, rotationMatrix);
-		}
-		if (Game::GetInstance()->GetInputDevice()->IsKeyDown(Keys::W))
-		{
-
-			//rotation *= Quaternion::CreateFromAxisAngle(Vector3::Transform(Vector3::Left, rotationMatrix), rotationSpeed * deltaTime);
-			//position += deltaTime * rotationSpeed * Vector3::Transform(Vector3::Forward, rotationMatrix);
-		}
-		if (Game::GetInstance()->GetInputDevice()->IsKeyDown(Keys::S))
-		{
-
-			//rotation *= Quaternion::CreateFromAxisAngle(Vector3::Transform(Vector3::Right, rotationMatrix), rotationSpeed * deltaTime);
-			//position += deltaTime * rotationSpeed * Vector3::Transform(Vector3::Backward, rotationMatrix);
-		}
-		//SetRotation(rotation);
+		Vector3 pos = Game::GetInstance()->gameObjects.at(3)->transformComponent->GetPosition();
+		Quaternion rot = Game::GetInstance()->gameObjects.at(3)->transformComponent->GetRotation();
+		Game::GetInstance()->gameObjects.at(3)->transformComponent->parent = Game::GetInstance()->gameObjects.at(1)->transformComponent;
+		Game::GetInstance()->gameObjects.at(3)->transformComponent->SetPosition(pos);
+		Game::GetInstance()->gameObjects.at(3)->transformComponent->SetRotation(rot);
 	}
-	else
-	{
-		//SetRotation(Quaternion::Identity);
-	}
+	*/
+}
+
+void GameObject::AddComponent(Component* component)
+{
+	components.push_back(component);
+	component->gameObject = this;
 }

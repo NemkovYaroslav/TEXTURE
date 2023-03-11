@@ -88,7 +88,6 @@ void Game::Run()
 void Game::Update()
 {
 	UpdateInternal();
-
 	for (auto& object : gameObjects)
 	{
 		object->Update(deltaTime);

@@ -11,16 +11,14 @@ class GameObject
 {
 public:
 
+	DirectX::BoundingSphere* collisionSphere;
+
 	TransformComponent* transformComponent;
 	RenderComponent* renderComponent;
 
 	std::vector<Component*> components;
 
-	Vector3 rotationAxis;
-	float rotationSpeed;
-
 	float radius;
-	bool isKatamari;
 
 	GameObject(GameObject* parent = nullptr);
 	~GameObject();

@@ -23,9 +23,6 @@ private:
 	float deltaTime;
 	unsigned int frameCount;
 
-	bool wasProjectionKeyDown = false;
-	bool wasCameraControllerKeyDown = false;
-
 protected:
 
 	Game(LPCWSTR name, int clientWidth, int clientHeight);

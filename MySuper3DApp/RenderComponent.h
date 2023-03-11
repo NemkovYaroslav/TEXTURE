@@ -9,8 +9,6 @@ class RenderComponent : public Component
 {
 public:
 
-    Matrix World;
-
     RenderComponent(std::string shaderFileName, D3D_PRIMITIVE_TOPOLOGY topology);
     RenderComponent(std::string shaderFileName, LPCWSTR textureFileName, D3D_PRIMITIVE_TOPOLOGY topology);
     RenderComponent() = delete;
@@ -45,6 +43,4 @@ protected:
     Microsoft::WRL::ComPtr<ID3D11Resource> texture;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> textureView;
     Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
-
-    D3D11_FILL_MODE fillMode;
 };
