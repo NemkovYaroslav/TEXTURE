@@ -19,12 +19,13 @@ void CollisionComponent::Update(float deltaTime)
 {
 	if ((Game::GetInstance()->gameObjects.at(2)->collisionComponent->sphereCollision->Intersects(*(gameObject->collisionComponent->sphereCollision)) && (Game::GetInstance()->gameObjects.at(2) != gameObject)) && (!gameObject->collisionComponent->isPickedUp))
 	{
-		std::cout << " YES " << std::endl;
 		Vector3 pos = gameObject->transformComponent->GetPosition();
 		Quaternion rot = gameObject->transformComponent->GetRotation();
 		gameObject->transformComponent->parent = Game::GetInstance()->gameObjects.at(2)->transformComponent;
 		gameObject->transformComponent->SetPosition(pos);
 		gameObject->transformComponent->SetRotation(rot);
+		Game::GetInstance()->gameObjects.at(2)->collisionComponent->sphereCollision->Radius += 0.03f;
+		std::cout << Game::GetInstance()->gameObjects.at(2)->collisionComponent->sphereCollision->Radius << std::endl;
 		gameObject->collisionComponent->isPickedUp = true;
 	}
 	sphereCollision->Center = gameObject->transformComponent->GetPosition();
