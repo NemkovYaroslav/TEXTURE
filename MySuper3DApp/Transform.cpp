@@ -7,6 +7,13 @@ TransformComponent::TransformComponent() : Component()
 	parent = nullptr;
 }
 
+TransformComponent::TransformComponent(Vector3 position, Quaternion rotation)
+{
+	localPosition = position;
+	localRotation = rotation;
+	parent = nullptr;
+}
+
 void TransformComponent::Initialize()
 {
 
@@ -19,7 +26,14 @@ void TransformComponent::Update()
 
 Vector3 TransformComponent::GetPosition() const
 {
-	return Vector3::Transform(localPosition, GetModel());
+	if (parent)
+	{
+		return Vector3::Transform(localPosition, parent->GetModel());
+	}
+	else
+	{
+		return localPosition;
+	}
 }
 
 Quaternion TransformComponent::GetRotation() const
@@ -36,7 +50,14 @@ Quaternion TransformComponent::GetRotation() const
 
 void TransformComponent::SetPosition(const Vector3& position)
 {
-	localPosition = Vector3::Transform(position, GetView());
+	if (parent)
+	{
+		localPosition = Vector3::Transform(position, parent->GetView());
+	}
+	else
+	{
+		localPosition = position;
+	}
 }
 
 void TransformComponent::SetRotation(const Quaternion& rotation)
@@ -45,7 +66,7 @@ void TransformComponent::SetRotation(const Quaternion& rotation)
 	{
 		Quaternion quaternion;
 		parent->GetRotation().Inverse(quaternion);
-		localRotation = quaternion * rotation;
+		localRotation = rotation * quaternion;
 	}
 	else
 	{
@@ -85,4 +106,34 @@ Matrix TransformComponent::GetModel() const
 Matrix TransformComponent::GetLocalModel() const
 {
 	return Matrix::CreateFromQuaternion(localRotation) * Matrix::CreateTranslation(localPosition);
+}
+
+Vector3 TransformComponent::GetLocalLeft() const
+{
+	return Vector3::TransformNormal(Vector3::Right, GetLocalModel());
+}
+
+Vector3 TransformComponent::GetLocalUp() const
+{
+	return Vector3::TransformNormal(Vector3::Up, GetLocalModel());
+}
+
+Vector3 TransformComponent::GetLocalForward() const
+{
+	return Vector3::TransformNormal(Vector3::Forward, GetLocalModel());
+}
+
+Vector3 TransformComponent::GetLeft() const
+{
+	return Vector3::TransformNormal(Vector3::Right, GetModel());
+}
+
+Vector3 TransformComponent::GetUp() const
+{
+	return Vector3::TransformNormal(Vector3::Up, GetModel());
+}
+
+Vector3 TransformComponent::GetForward() const
+{
+	return Vector3::TransformNormal(Vector3::Forward, GetModel());
 }

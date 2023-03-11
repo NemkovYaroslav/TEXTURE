@@ -72,13 +72,16 @@
     <ClCompile Include="CameraController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TPSCameraController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="KatamariDamacyGame.cpp">
       <Filter>Project</Filter>
     </ClCompile>
     <ClCompile Include="Transform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FPSCameraController.cpp">
+      <Filter>Project</Filter>
+    </ClCompile>
+    <ClCompile Include="KatamariControllerComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -125,13 +128,16 @@
     <ClInclude Include="CameraController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TPSCameraController.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="KatamariDamacyGame.h">
       <Filter>Project</Filter>
     </ClInclude>
     <ClInclude Include="Transform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FPSCameraController.h">
+      <Filter>Project</Filter>
+    </ClInclude>
+    <ClInclude Include="KatamariControllerComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -142,6 +148,9 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Shaders\MyVeryFirstShader.hlsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Shaders\TexturedShader.hlsl">
       <Filter>Resource Files\Shaders</Filter>
     </FxCompile>
   </ItemGroup>

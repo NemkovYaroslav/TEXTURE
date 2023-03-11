@@ -12,6 +12,7 @@ public:
     TransformComponent* parent;
 
     TransformComponent();
+    TransformComponent(Vector3 position, Quaternion rotation);
 
     void Initialize();
     void Update();
@@ -24,4 +25,11 @@ public:
     Matrix GetLocalView() const;
     Matrix GetModel() const;
     Matrix GetLocalModel() const;
+    
+    Vector3 GetLocalLeft() const;
+    Vector3 GetLocalUp() const;
+    Vector3 GetLocalForward() const;
+    Vector3 GetLeft() const;
+    Vector3 GetUp() const;
+    Vector3 GetForward() const;
 };

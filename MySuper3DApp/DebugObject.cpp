@@ -6,6 +6,6 @@ DebugObject::DebugObject() {}
 void DebugObject::CreateGrid(int gridSize, float cellSize, DirectX::SimpleMath::Color color)
 {
 	renderComponent = new RenderComponent("../Shaders/MyVeryFirstShader.hlsl", D3D_PRIMITIVE_TOPOLOGY_LINELIST);
-	components.push_back(renderComponent);
+	AddComponent(renderComponent);
 	renderComponent->AddGrid(gridSize, cellSize, color);
 }

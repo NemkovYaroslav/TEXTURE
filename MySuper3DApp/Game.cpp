@@ -3,7 +3,6 @@
 #include "DisplayWin32.h"
 #include "InputDevice.h"
 #include "Camera.h"
-#include "TPSCameraController.h"
 #include "GameObject.h"
 
 Game* Game::instance = nullptr;
@@ -18,6 +17,7 @@ Game::Game(LPCWSTR name, int clientWidth, int clientHeight)
 	frameCount = 0;
 	startTime = std::make_shared<std::chrono::time_point<std::chrono::steady_clock>>();
 	prevTime = std::make_shared<std::chrono::time_point<std::chrono::steady_clock>>();
+	currentCamera = nullptr;
 }
 Game* Game::CreateInstance(LPCWSTR name, int screenWidth, int screenHeight)
 {
@@ -36,10 +36,7 @@ void Game::PrepareResources()
 {
 	display = std::make_shared<DisplayWin32>(name, clientWidth, clientHeight, WndProc);
 	inputDevice = std::make_shared<InputDevice>();
-	camera = std::make_shared<Camera>();
 	render = std::make_shared<RenderSystem>();
-	tpsCameraController = std::make_shared<TPSCameraController>();
-	camera->SetCameraController(tpsCameraController.get());
 }
 
 void Game::Initialize()
@@ -104,7 +101,6 @@ void Game::UpdateInternal()
 	{
 		PostQuitMessage(0);
 	}
-	camera->Update(deltaTime);
 }
 
 void Game::Draw()
@@ -131,8 +127,6 @@ void Game::AddGameObject(GameObject* gameObject)
 std::shared_ptr<RenderSystem> Game::GetRenderSystem() { return render;      }
 std::shared_ptr<DisplayWin32> Game::GetDisplay()      { return display;     }
 std::shared_ptr<InputDevice>  Game::GetInputDevice()  { return inputDevice; }
-std::shared_ptr<Camera>       Game::GetCamera()       { return camera;      }
-
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 {

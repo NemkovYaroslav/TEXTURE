@@ -1,27 +1,25 @@
 #pragma once
 #include "includes.h"
 #include "InputDevice.h"
+#include "Component.h"
 
-class Camera;
+class TransformComponent;
 
 using namespace DirectX::SimpleMath;
 
-class CameraController
+class CameraArmControllerComponent : public Component
 {
-protected:
-
-	float cameraRotationSpeed = 0.005f;
-	bool wasCameraControllerKeyDown = false;
-
 public:
 
-	float yaw = 0;
-	float pitch = 0;
+	TransformComponent* aim;
+	float yaw;
+	float pitch;
+	float minPitch;
+	float maxPitch;
+	float armLength;
 
-	Matrix rotationMatrix;
-
-	CameraController();
-	virtual void Update(float deltaTime) = 0;
-
-	virtual void MouseEventHandler(const InputDevice::MouseMoveEventArgs& mouseData) = 0;
+	CameraArmControllerComponent();
+	virtual void Update(float deltaTime) override;
+	virtual void Initialize() override;
+	virtual void MouseEventHandler(const InputDevice::MouseMoveEventArgs& mouseData) override;
 };

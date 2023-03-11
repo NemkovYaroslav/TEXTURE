@@ -11,14 +11,13 @@ public:
 
     Matrix World;
 
-    //RenderComponent(std::string shaderFileName, D3D_PRIMITIVE_TOPOLOGY topology);
     RenderComponent(std::string shaderFileName, D3D_PRIMITIVE_TOPOLOGY topology);
     RenderComponent(std::string shaderFileName, LPCWSTR textureFileName, D3D_PRIMITIVE_TOPOLOGY topology);
     RenderComponent() = delete;
     ~RenderComponent();
 
-    void Initialize();
-    void Update();
+    virtual void Initialize() override;
+    virtual void Update(float deltaTime) override;
 
     void Draw();
     void AddGrid(int gridSize, float cellSize, Color color);

@@ -1,11 +1,13 @@
 #include "RenderComponent.h"
 
+#include <WICTextureLoader.h>
 #include "Game.h"
 #include "DisplayWin32.h"
 #include "Camera.h"
 #include "RenderSystem.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include "GameObject.h"
 
 RenderComponent::RenderComponent(std::string shaderFileName, D3D_PRIMITIVE_TOPOLOGY topology) : Component()
 {
@@ -31,6 +33,7 @@ RenderComponent::~RenderComponent()
 void RenderComponent::Initialize()
 {
 	Game::GetInstance()->GetRenderSystem()->renderComponents.push_back(this);
+
 	std::wstring fileName(shaderFileName.begin(), shaderFileName.end());
 	ID3DBlob* errorCode = nullptr;
 
@@ -185,23 +188,46 @@ void RenderComponent::Initialize()
 	constBufDesc.ByteWidth = sizeof(DirectX::XMMATRIX);
 	Game::GetInstance()->GetRenderSystem()->device->CreateBuffer(&constBufDesc, nullptr, constBuffer.GetAddressOf());
 
+	if (isTexture)
+	{
+		res = DirectX::CreateWICTextureFromFile(
+			Game::GetInstance()->GetRenderSystem()->device.Get(),
+			Game::GetInstance()->GetRenderSystem()->context.Get(),
+			textureFileName,
+			texture.GetAddressOf(),
+			textureView.GetAddressOf()
+		);
+
+		D3D11_SAMPLER_DESC samplerStateDesc = {};
+		samplerStateDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		samplerStateDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerStateDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerStateDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+
+		res = Game::GetInstance()->GetRenderSystem()->device->CreateSamplerState(&samplerStateDesc, samplerState.GetAddressOf());
+
+	}
+
 	CD3D11_RASTERIZER_DESC rastDesc = {};
 	rastDesc.CullMode = D3D11_CULL_NONE;
 	rastDesc.FillMode = D3D11_FILL_SOLID;
+	rastDesc.DepthClipEnable = true;
 	Game::GetInstance()->GetRenderSystem()->device->CreateRasterizerState(&rastDesc, rastState.GetAddressOf());
 }
 
-void RenderComponent::Update()
+void RenderComponent::Update(float deltaTime)
 {
-	DirectX::XMMATRIX worldViewProjectionMatrix = Game::GetInstance()->GetCamera()->GetWorldViewProjectionMatrix(World);
+	DirectX::XMMATRIX modelViewProjectionMatrix = gameObject->transformComponent->GetModel() *
+		Game::GetInstance()->currentCamera->gameObject->transformComponent->GetView() * Game::GetInstance()->currentCamera->GetProjection();
+
 	DirectX::XMMATRIX ScaledMatrix = DirectX::XMMatrixScaling(
 		static_cast<float>(Game::GetInstance()->GetDisplay()->GetClientHeight())
 		/ 
 		static_cast<float>(Game::GetInstance()->GetDisplay()->GetClientWidth()),
 		1.0f,
-		1.0f\
+		1.0f
 	);
-	DirectX::XMMATRIX Transform = DirectX::XMMatrixTranspose(DirectX::XMMatrixMultiply(ScaledMatrix, worldViewProjectionMatrix));
+	DirectX::XMMATRIX Transform = DirectX::XMMatrixTranspose(DirectX::XMMatrixMultiply(ScaledMatrix, modelViewProjectionMatrix));
 	Game::GetInstance()->GetRenderSystem()->context->UpdateSubresource(constBuffer.Get(), 0, nullptr, &Transform, 0, 0);
 }
 
@@ -215,8 +241,15 @@ void RenderComponent::Draw()
 	UINT offsets[] = { 0 };
 	Game::GetInstance()->GetRenderSystem()->context->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), strides, offsets);
 	Game::GetInstance()->GetRenderSystem()->context->VSSetShader(vertexShader.Get(), nullptr, 0);
-	Game::GetInstance()->GetRenderSystem()->context->VSSetConstantBuffers(0, 1, constBuffer.GetAddressOf());
 	Game::GetInstance()->GetRenderSystem()->context->PSSetShader(pixelShader.Get(), nullptr, 0);
+
+	if (isTexture)
+	{
+		Game::GetInstance()->GetRenderSystem()->context->PSSetShaderResources(0, 1, textureView.GetAddressOf());
+		Game::GetInstance()->GetRenderSystem()->context->PSSetSamplers(0, 1, samplerState.GetAddressOf());
+	}
+
+	Game::GetInstance()->GetRenderSystem()->context->VSSetConstantBuffers(0, 1, constBuffer.GetAddressOf());
 	Game::GetInstance()->GetRenderSystem()->context->DrawIndexed(indices.size(), 0, 0);
 }
 
@@ -256,65 +289,131 @@ void RenderComponent::AddCube(float radius)
 }
 void RenderComponent::AddSphere(float radius, int sliceCount, int stackCount, DirectX::XMFLOAT4 color)
 {
-	int g = 0;
-	points.push_back(DirectX::XMFLOAT4(0, radius, 0, 1));
-	points.push_back(DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
-	auto phiStep = M_PI / stackCount;
-	auto thetaStep = 2.0f * M_PI / sliceCount;
-	DirectX::XMFLOAT4 colorBase[] = { { 1.0f, 0.3f, 0.3f, 1.0f }, { 0.5f, 1.0f, 0.5f, 1.0f }, { 0.7f, 0.7f, 1.0f, 1.0f }, { 0.9f, 0.9f, 0.9f, 1.0f } };
-	for (int i = 1; i <= stackCount - 1; i++)
+	if (isTexture)
 	{
-		auto phi = i * phiStep;
-		for (int j = 0; j <= sliceCount; j++)
-		{
-			if (((j / 20 == g)) && (g < 4))
-			{
-				color = colorBase[g++];
+		points.push_back({ 0.0f, radius, 0.0f, 1.0f });
+		points.push_back({ 0.0f, 0.0f, 0.0f, 0.0f, });
+
+		const float phiStep = M_PI / static_cast<float>(stackCount);
+		const float thetaStep = 2 * M_PI / static_cast<float>(sliceCount);
+
+		for (int i = 1; i <= stackCount - 1; i++) {
+			const float phi = static_cast<float>(i) * phiStep;
+
+			for (int j = 0; j <= sliceCount; j++) {
+				const float theta = static_cast<float>(j) * thetaStep;
+				Vector4 tempPoint = {};
+				Vector4 tempTexCoords = {};
+
+				tempPoint.x = radius * sinf(phi) * cosf(theta);
+				tempPoint.y = radius * cosf(phi);
+				tempPoint.z = radius * sinf(phi) * sinf(theta);
+				tempPoint.w = 1.0f;
+
+				tempTexCoords.x = theta / 2 * M_PI;
+				tempTexCoords.y = phi / 2 * M_PI;
+
+				points.push_back(tempPoint);
+				points.push_back(tempTexCoords);
 			}
-			auto theta = j * thetaStep;
-			points.push_back(
-				DirectX::XMFLOAT4(
-					radius * sin(phi) * cos(theta),
-					radius * cos(phi),
-					radius * sin(phi) * sin(theta),
-					1.0f)
-			);
-			points.push_back(color);
 		}
-		g = 0;
-	}
-	points.push_back(DirectX::XMFLOAT4(0, -radius, 0, 1));
-	points.push_back(DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 
-	for (int i = 1; i <= sliceCount; i++)
-	{
-		indices.push_back(0);
-		indices.push_back(i + 1);
-		indices.push_back(i);
+		points.push_back({ 0.0f, -radius, 0.0f, 1.0f });
+		points.push_back({ 0.0f, 1.0f, 0.0f, 0.0f, });
+
+		for (int i = 1; i <= sliceCount; i++) {
+			indices.push_back(0);
+			indices.push_back(i + 1);
+			indices.push_back(i);
+		}
+
+		int baseIndex = 1;
+		const int ringVertexCount = sliceCount + 1;
+		for (int i = 0; i < stackCount - 2; i++) {
+			for (int j = 0; j < sliceCount; j++) {
+				indices.push_back(baseIndex + i * ringVertexCount + j);
+				indices.push_back(baseIndex + i * ringVertexCount + j + 1);
+				indices.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+
+				indices.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+				indices.push_back(baseIndex + i * ringVertexCount + j + 1);
+				indices.push_back(baseIndex + (i + 1) * ringVertexCount + j + 1);
+			}
+		}
+
+		const int southPoleIndex = points.size() / 2 - 1;
+
+		baseIndex = southPoleIndex - ringVertexCount;
+
+		for (int i = 0; i < sliceCount; i++) {
+			indices.push_back(southPoleIndex);
+			indices.push_back(baseIndex + i);
+			indices.push_back(baseIndex + i + 1);
+		}
+
 	}
-	auto baseIndex = 1;
-	auto ringVertexCount = sliceCount + 1;
-	for (int i = 0; i < stackCount - 2; i++)
+	else
 	{
-		for (int j = 0; j < sliceCount; j++)
+		int g = 0;
+		points.push_back(DirectX::XMFLOAT4(0, radius, 0, 1));
+		points.push_back(DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+		auto phiStep = M_PI / stackCount;
+		auto thetaStep = 2.0f * M_PI / sliceCount;
+		DirectX::XMFLOAT4 colorBase[] = { { 1.0f, 0.3f, 0.3f, 1.0f }, { 0.5f, 1.0f, 0.5f, 1.0f }, { 0.7f, 0.7f, 1.0f, 1.0f }, { 0.9f, 0.9f, 0.9f, 1.0f } };
+		for (int i = 1; i <= stackCount - 1; i++)
 		{
-			indices.push_back(baseIndex + i * ringVertexCount + j);
-			indices.push_back(baseIndex + i * ringVertexCount + j + 1);
-			indices.push_back(baseIndex + (i + 1) * ringVertexCount + j);
-
-			indices.push_back(baseIndex + (i + 1) * ringVertexCount + j);
-			indices.push_back(baseIndex + i * ringVertexCount + j + 1);
-			indices.push_back(baseIndex + (i + 1) * ringVertexCount + j + 1);
+			auto phi = i * phiStep;
+			for (int j = 0; j <= sliceCount; j++)
+			{
+				if (((j / 20 == g)) && (g < 4))
+				{
+					color = colorBase[g++];
+				}
+				auto theta = j * thetaStep;
+				points.push_back(
+					DirectX::XMFLOAT4(
+						radius * sin(phi) * cos(theta),
+						radius * cos(phi),
+						radius * sin(phi) * sin(theta),
+						1.0f)
+				);
+				points.push_back(color);
+			}
+			g = 0;
 		}
-	}
+		points.push_back(DirectX::XMFLOAT4(0, -radius, 0, 1));
+		points.push_back(DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 
-	auto southPoleIndex = indices.size() - 1;
-	baseIndex = southPoleIndex - ringVertexCount;
-	for (int i = 0; i < sliceCount; i++)
-	{
-		indices.push_back(southPoleIndex);
-		indices.push_back(baseIndex + i);
-		indices.push_back(baseIndex + i + 1);
+		for (int i = 1; i <= sliceCount; i++)
+		{
+			indices.push_back(0);
+			indices.push_back(i + 1);
+			indices.push_back(i);
+		}
+		auto baseIndex = 1;
+		auto ringVertexCount = sliceCount + 1;
+		for (int i = 0; i < stackCount - 2; i++)
+		{
+			for (int j = 0; j < sliceCount; j++)
+			{
+				indices.push_back(baseIndex + i * ringVertexCount + j);
+				indices.push_back(baseIndex + i * ringVertexCount + j + 1);
+				indices.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+
+				indices.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+				indices.push_back(baseIndex + i * ringVertexCount + j + 1);
+				indices.push_back(baseIndex + (i + 1) * ringVertexCount + j + 1);
+			}
+		}
+
+		auto southPoleIndex = indices.size() - 1;
+		baseIndex = southPoleIndex - ringVertexCount;
+		for (int i = 0; i < sliceCount; i++)
+		{
+			indices.push_back(southPoleIndex);
+			indices.push_back(baseIndex + i);
+			indices.push_back(baseIndex + i + 1);
+		}
 	}
 
 }

@@ -3,51 +3,25 @@
 #include "DisplayWin32.h"
 #include "CameraController.h"
 
-Camera::Camera()
+CameraComponent::CameraComponent()
 {
-	position = Vector3(Vector3::Up * 5);
-	target   = Vector3(Vector3::Zero);
-	up       = Vector3(Vector3::Up);
-	cameraController = nullptr;
+	aspect = 1.0f;
+	nearZ = 0.1f;
+	farZ = 1000.0f;
 }
 
-void Camera::Update(float deltaTime)
+void CameraComponent::Initialize()
 {
-	if (cameraController)
-	{
-		cameraController->Update(deltaTime);
-	}
-
-	view = Matrix::CreateLookAt(position, target, up);
-
-	if (isPerspectiveProjection)
-	{
-		projection = Matrix::CreatePerspectiveFieldOfView(
-			fovAngle,
-			static_cast<float>(Game::GetInstance()->GetDisplay()->GetClientWidth()) / Game::GetInstance()->GetDisplay()->GetClientHeight(),
-			0.1f,
-			1000.0f);
-	}
-	else
-	{
-		projection = Matrix::CreateOrthographic(
-			Game::GetInstance()->GetDisplay()->GetClientWidth() / 40,
-			Game::GetInstance()->GetDisplay()->GetClientHeight() / 40,
-			0.1f,
-			1000);
-	}
+	aspect = Game::GetInstance()->GetDisplay()->GetClientWidth() / Game::GetInstance()->GetDisplay()->GetClientHeight();
 }
 
-Matrix Camera::GetWorldViewProjectionMatrix(Matrix World)
+Matrix CameraComponent::GetProjection()
 {
-	return World * view * projection;
-}
-
-CameraController* Camera::GetCameraController()
-{
-	return cameraController;
-}
-void Camera::SetCameraController(CameraController* cameraController)
-{
-	this->cameraController = cameraController;
+	Matrix rotation = Matrix::CreateFromAxisAngle(Vector3::Up, DirectX::XM_PI);
+	return rotation * Matrix::CreatePerspectiveFieldOfView(
+		fovAngle,
+		aspect,
+		nearZ,
+		farZ
+	);
 }

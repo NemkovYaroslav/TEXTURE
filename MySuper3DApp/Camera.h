@@ -1,30 +1,21 @@
 #pragma once
 #include "includes.h"
+#include "Transform.h"
+#include "Component.h"
 
 using namespace DirectX::SimpleMath;
 
-class CameraController;
-
-class Camera
+class CameraComponent : public Component
 {
-protected:
-
-	CameraController* cameraController;
-
 public:
 
-	CameraController* GetCameraController();
-	void SetCameraController(CameraController* cameraController);
+	CameraComponent();
 
-	Camera();
-	void Update(float deltaTime);
-	Matrix GetWorldViewProjectionMatrix(Matrix World);
+	virtual void Initialize() override;
 
-	bool isPerspectiveProjection = true;
-	Matrix view;
-	Matrix projection;
-	Vector3 position;
-	Vector3 target;
-	Vector3 up;
+	Matrix GetProjection();
 	float fovAngle = DirectX::XM_PIDIV2;
+	float aspect;
+	float nearZ;
+	float farZ;
 };

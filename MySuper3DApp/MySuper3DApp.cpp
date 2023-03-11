@@ -1,5 +1,7 @@
 #include <iostream>
 #include "KatamariDamacyGame.h"
+#include "Transform.h"
+#include "SimpleMath.h"
 
 int main()
 {
