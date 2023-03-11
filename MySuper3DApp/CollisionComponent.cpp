@@ -25,7 +25,6 @@ void CollisionComponent::Update(float deltaTime)
 		gameObject->transformComponent->SetPosition(pos);
 		gameObject->transformComponent->SetRotation(rot);
 		Game::GetInstance()->gameObjects.at(2)->collisionComponent->sphereCollision->Radius += 0.03f;
-		std::cout << Game::GetInstance()->gameObjects.at(2)->collisionComponent->sphereCollision->Radius << std::endl;
 		gameObject->collisionComponent->isPickedUp = true;
 	}
 	sphereCollision->Center = gameObject->transformComponent->GetPosition();
