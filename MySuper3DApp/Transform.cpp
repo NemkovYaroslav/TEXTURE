@@ -4,6 +4,7 @@ TransformComponent::TransformComponent() : Component()
 {
 	localPosition = Vector3::Zero;
 	localRotation = Quaternion::Identity;
+	scale = Vector3(1, 1, 1);
 	parent = nullptr;
 }
 
@@ -88,7 +89,7 @@ Matrix TransformComponent::GetView() const
 
 Matrix TransformComponent::GetLocalView() const
 {
-	return Matrix::CreateTranslation( - localPosition) * Matrix::CreateFromQuaternion(localRotation).Transpose();
+	return Matrix::CreateTranslation( - localPosition) * Matrix::CreateFromQuaternion(localRotation).Transpose() * Matrix::CreateScale(Vector3(1 / scale.x, 1 / scale.y, 1 / scale.z));
 }
 
 Matrix TransformComponent::GetModel() const
@@ -105,7 +106,7 @@ Matrix TransformComponent::GetModel() const
 
 Matrix TransformComponent::GetLocalModel() const
 {
-	return Matrix::CreateFromQuaternion(localRotation) * Matrix::CreateTranslation(localPosition);
+	return Matrix::CreateScale(scale) * Matrix::CreateFromQuaternion(localRotation) * Matrix::CreateTranslation(localPosition);
 }
 
 Vector3 TransformComponent::GetLocalLeft() const

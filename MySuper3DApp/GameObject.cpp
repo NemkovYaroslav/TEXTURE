@@ -29,7 +29,7 @@ GameObject::~GameObject()
 void GameObject::CreateSphere(float radius, int sliceCount, int stackCount, DirectX::XMFLOAT4 color)
 {
 	this->radius = radius;
-	renderComponent = new RenderComponent("../Shaders/TexturedShader.hlsl", "../Textures/Gachi.jpg", D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	renderComponent = new RenderComponent("../Shaders/TexturedShader.hlsl", "../Textures/poll.bmp", D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//renderComponent = new RenderComponent("../Shaders/MyVeryFirstShader.hlsl", D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	renderComponent->AddSphere(radius, sliceCount, stackCount, color);
 	AddComponent(renderComponent);
@@ -38,9 +38,16 @@ void GameObject::CreateSphere(float radius, int sliceCount, int stackCount, Dire
 void GameObject::CreateCube(float radius)
 {
 	this->radius = radius;
-	renderComponent = new RenderComponent("../Shaders/TexturedShader.hlsl", "../Textures/earth.png", D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	renderComponent = new RenderComponent("../Shaders/TexturedShader.hlsl", "../Textures/gold.bmp", D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//renderComponent = new RenderComponent("../Shaders/MyVeryFirstShader.hlsl", D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	renderComponent->AddCube(radius);
+	AddComponent(renderComponent);
+}
+
+void GameObject::CreateMesh(float scaleRate)
+{
+	renderComponent = new RenderComponent("../Shaders/TexturedShader.hlsl", "../Textures/tennis.png", D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	renderComponent->AddMesh(scaleRate);
 	AddComponent(renderComponent);
 }
 

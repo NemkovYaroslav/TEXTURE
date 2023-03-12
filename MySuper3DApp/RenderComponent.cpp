@@ -255,10 +255,10 @@ void RenderComponent::Draw()
 void RenderComponent::AddCube(float radius)
 {
 	points = {
-		Vector4(   radius,   radius, 0.0f, 1.0f), Vector4(25.0f, 25.0f,	0.0f, 0.0f),
-		Vector4( - radius, - radius, 0.0f, 1.0f), Vector4(0.0f, 0.0f,	0.0f, 0.0f),
-		Vector4(   radius, - radius, 0.0f, 1.0f), Vector4(25.0f, 0.0f,	0.0f, 0.0f),
-		Vector4( - radius,   radius, 0.0f, 1.0f), Vector4(0.0f, 25.0f,	0.0f, 0.0f)
+		Vector4(   radius,   radius, 0.0f, 1.0f), Vector4(radius * 2, radius * 2, 0.0f, 0.0f),
+		Vector4( - radius, - radius, 0.0f, 1.0f), Vector4( 0.0f,   0.0f,  0.0f, 0.0f),
+		Vector4(   radius, - radius, 0.0f, 1.0f), Vector4(radius * 2,  0.0f,  0.0f, 0.0f),
+		Vector4( - radius,   radius, 0.0f, 1.0f), Vector4( 0.0f,  radius * 2, 0.0f, 0.0f)
 	};
 	indices = { 0, 1, 2, 1, 0, 3 };
 }
@@ -417,6 +417,54 @@ void RenderComponent::AddGrid(int gridSize, float cellSize, Color color)
 				indices.push_back(firstPointIndex + i * nPoints + j);
 				indices.push_back(firstPointIndex + i * nPoints + j + nPoints);
 			}
+		}
+	}
+}
+
+
+void RenderComponent::AddMesh(float scaleRate)
+{
+	Assimp::Importer importer;
+	const aiScene* pScene = importer.ReadFile("../Models/tennis_Ball_obj.obj", aiProcess_Triangulate | aiProcess_ConvertToLeftHanded);
+
+	if (!pScene) { return; }
+
+	ProcessNode(pScene->mRootNode, pScene, scaleRate);
+}
+void RenderComponent::ProcessNode(aiNode* node, const aiScene* scene, float scaleRate)
+{
+	for (UINT i = 0; i < node->mNumMeshes; i++)
+	{
+		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+		ProcessMesh(mesh, scene, scaleRate);
+	}
+
+	for (UINT i = 0; i < node->mNumChildren; i++)
+	{
+		ProcessNode(node->mChildren[i], scene, scaleRate);
+	}
+}
+void RenderComponent::ProcessMesh(aiMesh* mesh, const aiScene* scene, float scaleRate)
+{
+	for (UINT i = 0; i < mesh->mNumVertices; i++) {
+		DirectX::SimpleMath::Vector4 textureCoordinate = {};
+
+		if (mesh->mTextureCoords[0])
+		{
+			textureCoordinate.x = (float)mesh->mTextureCoords[0][i].x;
+			textureCoordinate.y = (float)mesh->mTextureCoords[0][i].y;
+		}
+
+		points.push_back({ mesh->mVertices[i].x * scaleRate, mesh->mVertices[i].y * scaleRate, mesh->mVertices[i].z * scaleRate, 1.0f});
+		points.push_back(textureCoordinate);
+	}
+
+	for (UINT i = 0; i < mesh->mNumFaces; i++) {
+		aiFace face = mesh->mFaces[i];
+
+		for (UINT j = 0; j < face.mNumIndices; j++)
+		{
+			indices.push_back(face.mIndices[j]);
 		}
 	}
 }

@@ -2,6 +2,9 @@
 #include "Component.h"
 
 #include <vector>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 using namespace DirectX::SimpleMath;
 
@@ -21,6 +24,10 @@ public:
     void AddGrid(int gridSize, float cellSize, Color color);
     void AddCube(float radius);
     void AddSphere(float radius, int sliceCount, int stackCount, DirectX::XMFLOAT4 color);
+    void AddMesh(float scaleRate);
+
+    void ProcessNode(aiNode* node, const aiScene* scene, float scaleRate);
+    void ProcessMesh(aiMesh* mesh, const aiScene* scene, float scaleRate);
 
 protected:
 

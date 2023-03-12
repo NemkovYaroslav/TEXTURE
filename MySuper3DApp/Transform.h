@@ -11,6 +11,8 @@ public:
     Quaternion localRotation;
     TransformComponent* parent;
 
+    Vector3 scale;
+
     TransformComponent();
     TransformComponent(Vector3 position, Quaternion rotation);
 
