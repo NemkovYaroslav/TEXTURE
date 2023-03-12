@@ -46,7 +46,7 @@ void GameObject::CreateCube(float radius)
 
 void GameObject::CreateMesh(float scaleRate)
 {
-	renderComponent = new RenderComponent("../Shaders/TexturedShader.hlsl", "../Textures/tennis.png", D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	renderComponent = new RenderComponent("../Shaders/TexturedShader.hlsl", "../Textures/BombTexture.png", D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	renderComponent->AddMesh(scaleRate);
 	AddComponent(renderComponent);
 }

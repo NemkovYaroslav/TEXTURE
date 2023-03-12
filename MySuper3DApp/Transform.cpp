@@ -89,7 +89,8 @@ Matrix TransformComponent::GetView() const
 
 Matrix TransformComponent::GetLocalView() const
 {
-	return Matrix::CreateTranslation( - localPosition) * Matrix::CreateFromQuaternion(localRotation).Transpose() * Matrix::CreateScale(Vector3(1 / scale.x, 1 / scale.y, 1 / scale.z));
+	return Matrix::CreateTranslation( - localPosition) *
+		Matrix::CreateFromQuaternion(localRotation).Transpose() * Matrix::CreateScale(Vector3(1 / scale.x, 1 / scale.y, 1 / scale.z));
 }
 
 Matrix TransformComponent::GetModel() const

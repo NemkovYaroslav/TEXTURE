@@ -425,7 +425,7 @@ void RenderComponent::AddGrid(int gridSize, float cellSize, Color color)
 void RenderComponent::AddMesh(float scaleRate)
 {
 	Assimp::Importer importer;
-	const aiScene* pScene = importer.ReadFile("../Models/tennis_Ball_obj.obj", aiProcess_Triangulate | aiProcess_ConvertToLeftHanded);
+	const aiScene* pScene = importer.ReadFile("../Models/bomb.fbx", aiProcess_Triangulate | aiProcess_ConvertToLeftHanded);
 
 	if (!pScene) { return; }
 

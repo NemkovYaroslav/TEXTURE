@@ -51,17 +51,21 @@ void KatamariDamacyGame::Initialize()
 	}
 	*/
 
-	GameObject* object = new GameObject();
-	object->CreateCube(20.0f);
-	object->transformComponent->SetRotation(Quaternion::CreateFromAxisAngle(Vector3::Right, DirectX::XM_PIDIV2));
+	//GameObject* object = new GameObject();
+	//object->CreateCube(20.0f);
+	//object->transformComponent->SetRotation(Quaternion::CreateFromAxisAngle(Vector3::Right, DirectX::XM_PIDIV2));
 
 	GameObject* object0 = new GameObject();
-	object0->CreateMesh(3.0f);
+	object0->CreateMesh(1.0f);
+	object0->transformComponent->SetPosition(Vector3(0,1,0));
+	object0->transformComponent->SetRotation(Quaternion::CreateFromAxisAngle(Vector3::Right, DirectX::XM_PIDIV2));
+
+	//Game::GetInstance()->AddGameObject(object);
+	//Game::GetInstance()->AddGameObject(object0);
 
 	Game::GetInstance()->AddGameObject(grid);
 	Game::GetInstance()->AddGameObject(camera);
 	Game::GetInstance()->AddGameObject(katamari);
-	Game::GetInstance()->AddGameObject(object);
 	Game::GetInstance()->AddGameObject(object0);
 }
 
