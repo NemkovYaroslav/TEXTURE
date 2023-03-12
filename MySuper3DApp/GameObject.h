@@ -29,4 +29,5 @@ public:
 	void AddComponent(Component* component);
 
 	void CreateSphere(float radius, int sliceCount = 80, int stackCount = 80, DirectX::XMFLOAT4 color = Vector4::One);
+	void CreateCube(float radius);
 };

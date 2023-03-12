@@ -29,9 +29,18 @@ GameObject::~GameObject()
 void GameObject::CreateSphere(float radius, int sliceCount, int stackCount, DirectX::XMFLOAT4 color)
 {
 	this->radius = radius;
-	//renderComponent = new RenderComponent("../Shaders/TexturedShader.hlsl", L".../Textures/Vladik.jpeg", D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	renderComponent = new RenderComponent("../Shaders/MyVeryFirstShader.hlsl", D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	renderComponent = new RenderComponent("../Shaders/TexturedShader.hlsl", "../Textures/Gachi.jpg", D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//renderComponent = new RenderComponent("../Shaders/MyVeryFirstShader.hlsl", D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	renderComponent->AddSphere(radius, sliceCount, stackCount, color);
+	AddComponent(renderComponent);
+}
+
+void GameObject::CreateCube(float radius)
+{
+	this->radius = radius;
+	renderComponent = new RenderComponent("../Shaders/TexturedShader.hlsl", "../Textures/earth.png", D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//renderComponent = new RenderComponent("../Shaders/MyVeryFirstShader.hlsl", D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	renderComponent->AddCube(radius);
 	AddComponent(renderComponent);
 }
 

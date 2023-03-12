@@ -40,6 +40,7 @@ void KatamariDamacyGame::Initialize()
 	Game::GetInstance()->AddGameObject(camera);
 	Game::GetInstance()->AddGameObject(katamari);
 
+	/*
 	GameObject* objectN;
 	CollisionComponent* objectCollisionN;
 	for (int i = 0; i < 50; i++)
@@ -52,6 +53,12 @@ void KatamariDamacyGame::Initialize()
 		objectN->transformComponent->SetPosition(Vector3( - 1.5f - objectN->radius * 2 * i, objectN->radius, 0));
 		Game::GetInstance()->AddGameObject(objectN);
 	}
+	*/
+
+	GameObject* object = new GameObject();
+	object->CreateCube(20.0f);
+	object->transformComponent->SetRotation(Quaternion::CreateFromAxisAngle(Vector3::Right, DirectX::XM_PIDIV2));
+	Game::GetInstance()->AddGameObject(object);
 }
 
 void KatamariDamacyGame::Run()

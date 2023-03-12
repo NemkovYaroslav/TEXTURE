@@ -10,7 +10,7 @@ class RenderComponent : public Component
 public:
 
     RenderComponent(std::string shaderFileName, D3D_PRIMITIVE_TOPOLOGY topology);
-    RenderComponent(std::string shaderFileName, LPCWSTR textureFileName, D3D_PRIMITIVE_TOPOLOGY topology);
+    RenderComponent(std::string shaderFileName, std::string textureFileName, D3D_PRIMITIVE_TOPOLOGY topology);
     RenderComponent() = delete;
     ~RenderComponent();
 
@@ -29,7 +29,7 @@ protected:
     std::vector<Vector4> points;
     std::vector<int> indices;
 
-    bool isTexture;
+    bool isTexture; //
 
     Microsoft::WRL::ComPtr<ID3D11VertexShader>    vertexShader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader>     pixelShader;
@@ -39,8 +39,8 @@ protected:
     Microsoft::WRL::ComPtr<ID3D11Buffer>          constBuffer;
     Microsoft::WRL::ComPtr<ID3D11RasterizerState> rastState;
 
-    LPCWSTR textureFileName;
-    Microsoft::WRL::ComPtr<ID3D11Resource> texture;
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> textureView;
-    Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
+    std::string textureFileName; //
+    Microsoft::WRL::ComPtr<ID3D11Resource> texture; //
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> textureView; //
+    Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState; //
 };

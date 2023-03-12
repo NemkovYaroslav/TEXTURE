@@ -5,22 +5,19 @@
 #include "DisplayWin32.h"
 #include "Camera.h"
 #include "RenderSystem.h"
-#define _USE_MATH_DEFINES
-#include <math.h>
 #include "GameObject.h"
 
 RenderComponent::RenderComponent(std::string shaderFileName, D3D_PRIMITIVE_TOPOLOGY topology) : Component()
 {
-	this->isTexture = false;
-	this->textureFileName = textureFileName;
+	this->isTexture = false; //
 	this->shaderFileName = shaderFileName;
 	this->topology = topology;
 }
 
-RenderComponent::RenderComponent(std::string shaderFileName, LPCWSTR textureFileName, D3D_PRIMITIVE_TOPOLOGY topology) : Component()
+RenderComponent::RenderComponent(std::string shaderFileName, std::string textureFileName, D3D_PRIMITIVE_TOPOLOGY topology) : Component()
 {
-	this->isTexture = true;
-	this->textureFileName = textureFileName;
+	this->isTexture = true; //
+	this->textureFileName = textureFileName; //
 	this->shaderFileName = shaderFileName;
 	this->topology = topology;
 }
@@ -35,6 +32,7 @@ void RenderComponent::Initialize()
 	Game::GetInstance()->GetRenderSystem()->renderComponents.push_back(this);
 
 	std::wstring fileName(shaderFileName.begin(), shaderFileName.end());
+
 	ID3DBlob* errorCode = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3DBlob> vertexShaderByteCode;
@@ -88,7 +86,7 @@ void RenderComponent::Initialize()
 		nullptr, pixelShader.GetAddressOf()
 	);
 
-	if (isTexture)
+	if (isTexture) //
 	{
 		D3D11_INPUT_ELEMENT_DESC inputElements[] = {
 			D3D11_INPUT_ELEMENT_DESC {
@@ -101,7 +99,7 @@ void RenderComponent::Initialize()
 				0
 			},
 			D3D11_INPUT_ELEMENT_DESC {
-				"TEXCOORD",
+				"TEXCOORD", //
 				0,
 				DXGI_FORMAT_R32G32B32A32_FLOAT,
 				0,
@@ -188,24 +186,25 @@ void RenderComponent::Initialize()
 	constBufDesc.ByteWidth = sizeof(DirectX::XMMATRIX);
 	Game::GetInstance()->GetRenderSystem()->device->CreateBuffer(&constBufDesc, nullptr, constBuffer.GetAddressOf());
 
-	if (isTexture)
+	if (isTexture) //
 	{
+		std::wstring textureName(textureFileName.begin(), textureFileName.end());
+
 		res = DirectX::CreateWICTextureFromFile(
 			Game::GetInstance()->GetRenderSystem()->device.Get(),
 			Game::GetInstance()->GetRenderSystem()->context.Get(),
-			textureFileName,
+			textureName.c_str(),
 			texture.GetAddressOf(),
 			textureView.GetAddressOf()
 		);
 
 		D3D11_SAMPLER_DESC samplerStateDesc = {};
-		samplerStateDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		samplerStateDesc.Filter   = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 		samplerStateDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 		samplerStateDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 		samplerStateDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 
 		res = Game::GetInstance()->GetRenderSystem()->device->CreateSamplerState(&samplerStateDesc, samplerState.GetAddressOf());
-
 	}
 
 	CD3D11_RASTERIZER_DESC rastDesc = {};
@@ -245,8 +244,8 @@ void RenderComponent::Draw()
 
 	if (isTexture)
 	{
-		Game::GetInstance()->GetRenderSystem()->context->PSSetShaderResources(0, 1, textureView.GetAddressOf());
-		Game::GetInstance()->GetRenderSystem()->context->PSSetSamplers(0, 1, samplerState.GetAddressOf());
+		Game::GetInstance()->GetRenderSystem()->context->PSSetShaderResources(0, 1, textureView.GetAddressOf()); //
+		Game::GetInstance()->GetRenderSystem()->context->PSSetSamplers(0, 1, samplerState.GetAddressOf()); //
 	}
 
 	Game::GetInstance()->GetRenderSystem()->context->VSSetConstantBuffers(0, 1, constBuffer.GetAddressOf());
@@ -256,36 +255,12 @@ void RenderComponent::Draw()
 void RenderComponent::AddCube(float radius)
 {
 	points = {
-		Vector4(-radius,   radius, -radius, 1.0f),  Vector4(0.1f, 0.9f, 0.7f, 1.0f),
-		Vector4(radius,   radius, -radius, 1.0f),  Vector4(0.2f, 1.0f, 0.8f, 1.0f),
-		Vector4(radius,   radius,   radius, 1.0f),  Vector4(0.3f, 0.1f, 0.9f, 1.0f),
-		Vector4(-radius,   radius,   radius, 1.0f),  Vector4(0.4f, 0.2f, 1.0f, 1.0f),
-		Vector4(-radius, -radius, -radius, 1.0f),  Vector4(0.5f, 0.3f, 0.1f, 1.0f),
-		Vector4(radius, -radius, -radius, 1.0f),  Vector4(0.6f, 0.4f, 0.2f, 1.0f),
-		Vector4(radius, -radius,   radius, 1.0f),  Vector4(0.7f, 0.5f, 0.3f, 1.0f),
-		Vector4(-radius, -radius,   radius, 1.0f),  Vector4(0.8f, 0.6f, 0.4f, 1.0f)
-
+		Vector4(   radius,   radius, 0.0f, 1.0f), Vector4(25.0f, 25.0f,	0.0f, 0.0f),
+		Vector4( - radius, - radius, 0.0f, 1.0f), Vector4(0.0f, 0.0f,	0.0f, 0.0f),
+		Vector4(   radius, - radius, 0.0f, 1.0f), Vector4(25.0f, 0.0f,	0.0f, 0.0f),
+		Vector4( - radius,   radius, 0.0f, 1.0f), Vector4(0.0f, 25.0f,	0.0f, 0.0f)
 	};
-	indices = {
-		3,1,0,
-		2,1,3,
-
-		0,5,4,
-		1,5,0,
-
-		3,4,7,
-		0,4,3,
-
-		1,6,5,
-		2,6,1,
-
-		2,7,6,
-		3,7,2,
-
-		6,4,5,
-		7,4,6
-	};
-
+	indices = { 0, 1, 2, 1, 0, 3 };
 }
 void RenderComponent::AddSphere(float radius, int sliceCount, int stackCount, DirectX::XMFLOAT4 color)
 {
@@ -294,14 +269,15 @@ void RenderComponent::AddSphere(float radius, int sliceCount, int stackCount, Di
 		points.push_back({ 0.0f, radius, 0.0f, 1.0f });
 		points.push_back({ 0.0f, 0.0f, 0.0f, 0.0f, });
 
-		const float phiStep = M_PI / static_cast<float>(stackCount);
-		const float thetaStep = 2 * M_PI / static_cast<float>(sliceCount);
+		const float phiStep = DirectX::XM_PI / static_cast<float>(stackCount);
+		const float thetaStep = DirectX::XM_2PI / static_cast<float>(sliceCount);
 
 		for (int i = 1; i <= stackCount - 1; i++) {
 			const float phi = static_cast<float>(i) * phiStep;
 
 			for (int j = 0; j <= sliceCount; j++) {
 				const float theta = static_cast<float>(j) * thetaStep;
+				
 				Vector4 tempPoint = {};
 				Vector4 tempTexCoords = {};
 
@@ -310,8 +286,8 @@ void RenderComponent::AddSphere(float radius, int sliceCount, int stackCount, Di
 				tempPoint.z = radius * sinf(phi) * sinf(theta);
 				tempPoint.w = 1.0f;
 
-				tempTexCoords.x = theta / 2 * M_PI;
-				tempTexCoords.y = phi / 2 * M_PI;
+				tempTexCoords.x = theta / DirectX::XM_2PI;
+				tempTexCoords.y = phi / DirectX::XM_2PI;
 
 				points.push_back(tempPoint);
 				points.push_back(tempTexCoords);
@@ -350,15 +326,14 @@ void RenderComponent::AddSphere(float radius, int sliceCount, int stackCount, Di
 			indices.push_back(baseIndex + i);
 			indices.push_back(baseIndex + i + 1);
 		}
-
 	}
 	else
 	{
 		int g = 0;
 		points.push_back(DirectX::XMFLOAT4(0, radius, 0, 1));
 		points.push_back(DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
-		auto phiStep = M_PI / stackCount;
-		auto thetaStep = 2.0f * M_PI / sliceCount;
+		auto phiStep = DirectX::XM_PI / stackCount;
+		auto thetaStep = DirectX::XM_2PI / sliceCount;
 		DirectX::XMFLOAT4 colorBase[] = { { 1.0f, 0.3f, 0.3f, 1.0f }, { 0.5f, 1.0f, 0.5f, 1.0f }, { 0.7f, 0.7f, 1.0f, 1.0f }, { 0.9f, 0.9f, 0.9f, 1.0f } };
 		for (int i = 1; i <= stackCount - 1; i++)
 		{
@@ -415,11 +390,9 @@ void RenderComponent::AddSphere(float radius, int sliceCount, int stackCount, Di
 			indices.push_back(baseIndex + i + 1);
 		}
 	}
-
 }
 void RenderComponent::AddGrid(int gridSize, float cellSize, Color color)
 {
-
 	int firstPointIndex = points.size() / 2;
 	int nPoints = gridSize * 2 + 1;
 	float offset = -(nPoints / 2) * cellSize;
